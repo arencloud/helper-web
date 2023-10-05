@@ -1,0 +1,42 @@
+name: Build and publish http-folder image
+
+on:
+  push:
+    branches:
+      - 'main'
+
+env:
+  IMAGE_NAME: 'arencloud/helper-web'
+
+jobs:
+  building-and-pushing-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: login to the registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ secrets.REG_URL }}
+          username: ${{ secrets.REG_USER }}
+          password: ${{ secrets.REG_TOKEN }}
+
+      - name: extract metadata
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ secrets.REG_URL }}/${{ env.IMAGE_NAME }}
+
+      - name: build and push
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
