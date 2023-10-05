@@ -44,5 +44,5 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ steps.meta.outputs.tags }} , latest
+          tags: ${{ steps.meta.outputs.tags }} , ${{ secrets.REG_URL }}/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
